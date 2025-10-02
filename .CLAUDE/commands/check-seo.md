@@ -143,3 +143,9 @@ For each action performed:
 - Apply only validated white-hat SEO techniques
 - Optimize for long-term maintenance and scalability
 - Automatically adapt to the detected tech stack
+
+## Feedback
+
+Provide feedback of changes made to the codebase.
+
+Provide feedback of all recomandations and suggestions developer can do for a better SEO like action on google console, some content to modify, etc.

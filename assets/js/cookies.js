@@ -251,8 +251,8 @@
             </div>
           </div>
           <div class="cookie-modal-footer">
-            <button class="btn-secondary" id="cookie-save-preferences">Enregistrer mes préférences</button>
-            <button class="btn-primary" id="cookie-accept-selected">Accepter la sélection</button>
+            <button class="btn-secondary" id="cookie-save-preferences">Enregistrer</button>
+            <button class="btn-primary" id="cookie-accept-selected">Tout accepter</button>
           </div>
         </div>
       `;
@@ -414,6 +414,66 @@
           display: flex;
           justify-content: flex-end;
           gap: 1rem;
+          flex-wrap: wrap;
+        }
+
+        .cookie-modal-footer .btn-primary,
+        .cookie-modal-footer .btn-secondary {
+          padding: 0.75rem 1.5rem;
+          border-radius: 0.75rem;
+          font-size: 0.875rem;
+          font-weight: 500;
+          font-family: 'Space Grotesk', 'Inter', sans-serif;
+          cursor: pointer;
+          transition: all 250ms ease-in-out;
+          border: none;
+        }
+
+        .cookie-modal-footer .btn-primary {
+          background: linear-gradient(135deg, #0f8cc8 0%, #1fb6ff 50%, #00d9ff 100%);
+          color: white;
+          box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .cookie-modal-footer .btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1), 0 0 20px rgb(15 140 200 / 0.15);
+        }
+
+        .cookie-modal-footer .btn-secondary {
+          background: white;
+          color: #0f8cc8;
+          border: 2px solid #0f8cc8 !important;
+          box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        .cookie-modal-footer .btn-secondary:hover {
+          background: #0f8cc8;
+          color: white;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        @media (max-width: 600px) {
+          .cookie-modal-content {
+            width: 95%;
+            max-height: 90vh;
+          }
+
+          .cookie-modal-header,
+          .cookie-modal-body,
+          .cookie-modal-footer {
+            padding: 1rem;
+          }
+
+          .cookie-modal-footer {
+            flex-direction: column;
+          }
+
+          .cookie-modal-footer .btn-primary,
+          .cookie-modal-footer .btn-secondary {
+            width: 100%;
+          }
         }
         
         .cookie-notification {
@@ -463,7 +523,7 @@
       });
 
       acceptBtn.addEventListener('click', () => {
-        this.saveCustomPreferences();
+        this.acceptAllFromModal();
         this.hideCustomizeModal();
       });
     },
@@ -493,11 +553,25 @@
         marketing: document.getElementById('cookie-marketing').checked,
         functional: document.getElementById('cookie-functional').checked
       };
-      
+
       this.savePreferences();
       this.hideBanner();
       this.applyPreferences();
       this.showNotification('Vos préférences de cookies ont été enregistrées');
+    },
+
+    acceptAllFromModal() {
+      this.preferences = {
+        necessary: true,
+        analytics: true,
+        marketing: true,
+        functional: true
+      };
+
+      this.savePreferences();
+      this.hideBanner();
+      this.applyPreferences();
+      this.showNotification('Tous les cookies ont été acceptés');
     },
 
     showNotification(message) {

@@ -118,24 +118,46 @@
   const initializeServiceTabs = () => {
     const tabBtns = document.querySelectorAll('.tab-btn');
     const serviceContents = document.querySelectorAll('.service-content');
+    const serviceDisplay = document.querySelector('.service-display');
 
     if (tabBtns.length && serviceContents.length) {
       tabBtns.forEach((btn, index) => {
         btn.addEventListener('click', () => {
           // Remove active class from all tabs and contents
           tabBtns.forEach(tab => tab.classList.remove('active'));
-          serviceContents.forEach(content => content.classList.remove('active'));
-          
+          serviceContents.forEach(content => {
+            content.classList.remove('active');
+            content.classList.add('fade-out');
+          });
+
           // Add active class to clicked tab and corresponding content
           btn.classList.add('active');
           const targetService = btn.getAttribute('data-service');
           const targetContent = document.querySelector(`[data-service-content="${targetService}"]`);
-          
+
           if (targetContent) {
-            // Add slight delay for smooth transition
+            // Add animation classes and activate content
             setTimeout(() => {
-              targetContent.classList.add('active');
-            }, 150);
+              serviceContents.forEach(content => content.classList.remove('fade-out'));
+              targetContent.classList.add('active', 'fade-in');
+
+              // Remove fade-in class after animation
+              setTimeout(() => {
+                targetContent.classList.remove('fade-in');
+              }, 500);
+
+              // Scroll to service display on mobile
+              if (window.innerWidth <= 1023 && serviceDisplay) {
+                const headerOffset = 100;
+                const elementPosition = serviceDisplay.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: 'smooth'
+                });
+              }
+            }, 200);
           }
         });
       });
@@ -151,37 +173,48 @@
     const indicators = document.querySelectorAll('.indicator');
     const prevBtn = document.querySelector('.carousel-btn.prev');
     const nextBtn = document.querySelector('.carousel-btn.next');
-    
+
     let currentIndex = 0;
     let isTransitioning = false;
 
-    const showTestimonial = (index) => {
+    const showTestimonial = (index, direction = 'right') => {
       if (isTransitioning) return;
       isTransitioning = true;
-      
+
+      const currentCard = testimonialCards[currentIndex];
+
+      // Add exit animation to current card
+      if (currentCard) {
+        currentCard.classList.add(direction === 'right' ? 'exit-left' : 'exit-right');
+      }
+
       // Remove active class from all
-      testimonialCards.forEach(card => card.classList.remove('active'));
-      indicators.forEach(indicator => indicator.classList.remove('active'));
-      
-      // Add active class to current
-      testimonialCards[index].classList.add('active');
-      indicators[index].classList.add('active');
-      
-      currentIndex = index;
-      
+      setTimeout(() => {
+        testimonialCards.forEach(card => {
+          card.classList.remove('active', 'exit-left', 'exit-right');
+        });
+        indicators.forEach(indicator => indicator.classList.remove('active'));
+
+        // Add active class to new card
+        testimonialCards[index].classList.add('active');
+        indicators[index].classList.add('active');
+
+        currentIndex = index;
+      }, 50);
+
       setTimeout(() => {
         isTransitioning = false;
-      }, 350);
+      }, 550);
     };
 
     const nextTestimonial = () => {
       const nextIndex = (currentIndex + 1) % testimonialCards.length;
-      showTestimonial(nextIndex);
+      showTestimonial(nextIndex, 'right');
     };
 
     const prevTestimonial = () => {
       const prevIndex = (currentIndex - 1 + testimonialCards.length) % testimonialCards.length;
-      showTestimonial(prevIndex);
+      showTestimonial(prevIndex, 'left');
     };
 
     // Button event listeners
@@ -190,7 +223,10 @@
 
     // Indicator event listeners
     indicators.forEach((indicator, index) => {
-      indicator.addEventListener('click', () => showTestimonial(index));
+      indicator.addEventListener('click', () => {
+        const direction = index > currentIndex ? 'right' : 'left';
+        showTestimonial(index, direction);
+      });
     });
 
     // Auto-play carousel
@@ -586,9 +622,60 @@
   };
 
   // =============================================================================
+  // Timeline Scroll Animation
+  // =============================================================================
+
+  const initializeTimelineScroll = () => {
+    const timelineItems = document.querySelectorAll('.timeline-content');
+
+    if (!timelineItems.length) return;
+
+    const updateTimeline = () => {
+      const viewportCenter = window.innerHeight / 2;
+      let closestItem = null;
+      let closestDistance = Infinity;
+
+      timelineItems.forEach(item => {
+        const rect = item.getBoundingClientRect();
+        const itemCenter = rect.top + (rect.height / 2);
+        const distance = Math.abs(viewportCenter - itemCenter);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestItem = item;
+        }
+      });
+
+      // Remove expanded class from all items
+      timelineItems.forEach(item => item.classList.remove('expanded'));
+
+      // Add expanded class to closest item if it's in viewport
+      if (closestItem && closestDistance < window.innerHeight / 2) {
+        closestItem.classList.add('expanded');
+      }
+    };
+
+    // Throttle scroll event
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          updateTimeline();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    // Initial check
+    updateTimeline();
+  };
+
+  // =============================================================================
   // Calendly Integration
   // =============================================================================
-  
+
   const initializeCalendly = () => {
     // Check if Calendly widget exists
     const calendlyWidget = document.querySelector('.calendly-inline-widget');
@@ -648,6 +735,7 @@
       initializeCounters();
       initializeScrollAnimations();
       initializeParticles();
+      initializeTimelineScroll();
       
       // Performance and accessibility
       optimizePerformance();
