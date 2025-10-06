@@ -848,6 +848,69 @@ strong {
   animation-delay: 4s;
 }
 
+.card-4 {
+  bottom: 10%;
+  right: 10%;
+  animation-delay: 1s;
+}
+
+/* Responsive adjustments for floating cards */
+@media (max-width: 1200px) and (min-width: 1024px) {
+  .card-1 {
+    top: 5%;
+    left: 5%;
+  }
+
+  .card-2 {
+    top: 5%;
+    right: 5%;
+  }
+
+  .card-3 {
+    bottom: 5%;
+    left: 5%;
+  }
+
+  .card-4 {
+    bottom: 5%;
+    right: 5%;
+  }
+}
+
+@media (max-width: 530px) and (min-width: 320px) {
+  .floating-cards .card {
+    font-size: 0.85rem;
+  }
+
+  .card-1 {
+    top: 2%;
+    left: 2%;
+  }
+
+  .card-2 {
+    top: 25%;
+    right: 2%;
+  }
+
+  .card-3 {
+    bottom: 25%;
+    left: 2%;
+  }
+
+  .card-4 {
+    bottom: 2%;
+    right: 2%;
+  }
+
+  .metric .value {
+    font-size: 1.5rem;
+  }
+
+  .metric .label {
+    font-size: 0.75rem;
+  }
+}
+
 @keyframes float-card {
   0%,
   100% {
